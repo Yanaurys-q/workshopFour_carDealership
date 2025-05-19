@@ -65,6 +65,9 @@ public class UserInterface {
                 case "9":
                     processRemoveVehicleRequest();
                     break;
+                case "10":
+                    processSellOrLeaseVehicleRequest();
+                    break;
                 case "0":
                     System.out.println("Exiting...");
                     running = false;
@@ -203,8 +206,58 @@ public class UserInterface {
         }
     }
 
-    private void processSellOrLeaseVehicleRequest()
-    {
-        //work
+    private void processSellOrLeaseVehicleRequest() {
+        System.out.print("Enter VIN of vehicle to sell/lease: ");
+        String vin = scanner.nextLine();
+        Vehicle vehicle = null;
+        for (Vehicle v : dealership.getAllVehicles()) {
+            if (v.getVin().equalsIgnoreCase(vin)) {
+                vehicle = v;
+                break;
+            }
+        }
+        if (vehicle == null) {
+            System.out.println("Vehicle not found.");
+            return;
+        }
+
+        System.out.print("Enter contract date (YYYYMMDD): ");
+        String date = scanner.nextLine();
+        System.out.print("Enter customer name: ");
+        String customerName = scanner.nextLine();
+        System.out.print("Enter customer email: ");
+        String customerEmail = scanner.nextLine();
+
+        System.out.print("Is this a sale or lease? (Enter 'sale' or 'lease'): ");
+        String contractType = scanner.nextLine().trim().toLowerCase();
+
+        Contract contract = null;
+
+        if (contractType.equals("sale")) {
+            System.out.print("Will the customer finance the vehicle? (yes/no): ");
+            boolean isFinanced = scanner.nextLine().trim().equalsIgnoreCase("yes");
+            contract = new SalesContract(date, customerName, customerEmail, vehicle, isFinanced);
+        } else if (contractType.equals("lease")) {
+            int currentYear = java.time.LocalDate.now().getYear();
+            if (currentYear - vehicle.getYear() > 3) {
+                System.out.println("Cannot lease a vehicle over 3 years old.");
+                return;
+            }
+            contract = new LeaseContract(date, customerName, customerEmail, vehicle);
+        } else {
+            System.out.println("Invalid contract type.");
+            return;
+        }
+
+        ContractFileManager.saveContract(contract);
+        dealership.removeVehicle(vin);
+        DealershipFileManager.saveDealership(dealership);
+
+        System.out.println("Contract processed and vehicle removed from inventory.");
+        System.out.println("Total Price: $" + contract.getTotalPrice());
+        System.out.println("Monthly Payment: $" + contract.getMonthlyPayment());
     }
 }
+
+
+

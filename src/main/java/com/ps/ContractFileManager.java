@@ -6,7 +6,7 @@ public class ContractFileManager
 {
     public static void saveContract(Contract contract)
     {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("contracts.csv", true))) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("Contracts.csv", true))) {
 
             if (contract instanceof SalesContract)
             {
@@ -18,8 +18,7 @@ public class ContractFileManager
                         contract.vehicleSold.toCSV() + "|" + contract.getTotalPrice() + "|" + contract.getMonthlyPayment());
             }
             bw.newLine();
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("Error saving contract: " + e.getMessage());
         }
     }

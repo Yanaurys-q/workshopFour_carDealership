@@ -10,7 +10,7 @@ public abstract class Contract {
         this.date = date;
         this.customerName = customerName;
         this.customerEmail = customerEmail;
-        this.vehicleSold = vehicleSold;
+        this.vehicleSold = vehicle;
     }
 
     public abstract double getTotalPrice();
